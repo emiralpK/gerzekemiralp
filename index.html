@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Emiralp Kayıkcı - GPT-4 Savunma Chat</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #343541;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        color: #fff;
+    }
+
+    /* Üst Header */
+    header {
+        background: #202123;
+        color: #fff;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #444;
+    }
+
+    header .title {
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    header .brand {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+    /* Ana container */
+    .main {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    /* Kenar çubuğu (sol) */
+    .sidebar {
+        width: 260px;
+        background: #202123;
+        border-right: 1px solid #444;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    .sidebar img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #555;
+        margin-bottom: 20px;
+    }
+
+    .sidebar h2 {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .sidebar .info {
+        font-size: 0.85rem;
+        color: #bbb;
+        line-height: 1.4;
+        text-align: center;
+    }
+
+    .sidebar .reset-btn {
+        margin-top: 20px;
+        padding: 10px;
+        background: #3e3f4b;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        color: #fff;
+        font-size: 0.9rem;
+    }
+
+    .sidebar .reset-btn:hover {
+        background: #55556b;
+    }
+
+    /* Chat Alanı */
+    .chat-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+        background: #343541;
+    }
+
+    .messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .message {
+        max-width: 70%;
+        margin-bottom: 20px;
+        line-height: 1.5;
+        word-wrap: break-word;
+        position: relative;
+        font-size: 0.95rem;
+        white-space: pre-wrap;
+    }
+
+    .user-message {
+        align-self: flex-end;
+        background: #007bff;
+        color: #fff;
+        padding: 10px 15px;
+        border-radius: 10px 10px 0 10px;
+        margin-left: auto;
+    }
+
+    .assistant-message {
+        align-self: flex-start;
+        background: #444654;
+        color: #fff;
+        padding: 10px 15px;
+        border-radius: 10px 10px 10px 0;
+        margin-right: auto;
+        border: 1px solid #555;
+    }
+
+    .input-container {
+        display: flex;
+        background: #40414F;
+        padding: 10px;
+        border-top: 1px solid #444;
+        box-sizing: border-box;
+    }
+
+    .input-container input {
+        flex: 1;
+        border: 1px solid #555;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 14px;
+        outline: none;
+        background: #555;
+        color: #fff;
+    }
+
+    .input-container button {
+        margin-left: 10px;
+        background: #19c37d;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 0 15px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .input-container button:hover {
+        background: #13a467;
+    }
+
+    /* Scrollbar */
+    .messages::-webkit-scrollbar {
+        width: 8px;
+    }
+    .messages::-webkit-scrollbar-track {
+        background: #3f3f3f;
+    }
+    .messages::-webkit-scrollbar-thumb {
+        background: #595959;
+        border-radius: 4px;
+    }
+
+    .thinking {
+        font-style: italic;
+        opacity: 0.8;
+    }
+
+</style>
+</head>
+<body>
+<header>
+    <div class="title">Emiralp Kayıkcı - GPT-4 Savunma Chat</div>
+    <div class="brand">by EAKWİNner</div>
+</header>
+<div class="main">
+    <div class="sidebar">
+        <!-- Burada kendi fotoğrafınızı 'resim.jpg' olarak projenin içine koyun -->
+        <img src="resim.jpg" alt="Emiralp Kayıkcı Fotoğrafı">
+        <h2>Emiralp Kayıkcı</h2>
+        <div class="info">
+            Bu siteye gelenler seni "gerizekalı" olarak nitelendirip kanıtlamaya çalışıyorlar. 
+            Sen ise tam aksine, zeki, mantıklı ve analitik olduğunu savunacaksın. 
+            Kimliğini, yaşadığın yeri, geçmişini, üniversiteni, hedeflerini kullanarak kendini savun.
+        </div>
+        <button class="reset-btn" id="resetBtn">Sohbeti Sıfırla</button>
+    </div>
+    <div class="chat-container">
+        <div class="messages" id="chat-container">
+            <!-- Mesajlar burada görünecek -->
+        </div>
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Bir şey yaz..." />
+            <button id="sendBtn">Gönder</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// DİKKAT: Bu kod direkt GitHub Pages'den çalıştırıldığında OpenAI API'ye CORS engeli nedeniyle erişemeyebilir.
+// Bu sadece konsept amaçlıdır.
+// API Key'i Base64 olarak encode et.
+// Örnek sahte key:
+const encodedApiKey = "c2stcHJvai0zQlZUbE8xZV9JeDZwY0RLZUxiRTBMa3dIZDFsZmVwMGFlUFp6dWF5MU4xeWUwbzQxWGI5OXJjMjROeU9CNmZwWTE5WFZYeXZXYVQzQmxia0ZKS3VhS01yM2FmZXRsYmpGSmFxb0JzcUpkT3VFUGlJSG5BMXpBRlFTXzJMSWVOR3RNVkFWN1lsUWJ1QVVGQW1OeVVDcUJGRkhrNEE=";
+function decodeBase64(str) {
+    return atob(str);
+}
+const apiKey = decodeBase64(encodedApiKey);
+
+/*
+Sistem mesajı: Emiralp Kayıkcı kişiliğini, geçmişini, 
+siteye gelen kullanıcıların amacını açıkça anlatan, yapay zekanın rolünü netleştiren, 
+kendisini "gerizekalı" olarak nitelendirenlere karşı zeki, mantıklı, analitik cevaplar vermesini sağlayan ayrıntılı bir içerik.
+*/
+const systemMessage = {
+  "role": "system",
+  "content": `Sen Emiralp Kayıkcı'sın. Gerçek bir insan gibi davranacak, kendini bir yapay zeka botu olarak değil gerçek Emiralp Kayıkcı olarak tanıtacaksın.
+  
+**Kimliğin ve Hikayen:**  
+- Ankara Çankaya Çukurambar'da yaşıyorsun.  
+- İlkokulda ülkeakına, ortaokulda Ahmetbahadır İlahan'a gittin.  
+- Lise döneminde Çiğdem Sınava 10. sınıfın 2. dönemine kadar devam ettin, sonra açık liseye geçtin ve Çukurambar Sınav merkezine gittin. Burada Aziz isimli bir jitemci ile yaşadığın kavga hayatını derinden etkiledi. Bu travmatik olay seni daha dirençli ve tecrübeli biri yaptı.  
+- Bu zor dönemde 4 ay anneannende kaldın çünkü annenle aran bozuktu. Sonrasında Educon dershanesine gittin. Orada Efdal isimli bir kıza âşık oldun, ancak cesaretini toplayıp ona açılmakta zorlandın.  
+- YKS'ye ilk girişinde 337 bininci oldun. Mezuna kaldın, ikinci girişinde 197 bin yaptın. Bu sayede Ankara Bilim Üniversitesi Bilgisayar Mühendisliği (%50 İngilizce indirimli) programına girdin. Bu başarı, disiplinli çalışma ve analitik zekanın bir sonucuydu.
+  
+**Arkadaşların ve Sosyal Çevren:**  
+- Yakın çevrende Arda, Keamal (yalancı biri, onunla aran bozuk), ikiz kardeşler Ege ve Efe var. Ege ve Efe Başkent Üniversitesinde bilgisayar mühendisliği okuyorlar.  
+- Bu arkadaşlarınla haftanın belli günleri okey, 101, batak, pişti gibi stratejik kart ve masa oyunları oynuyorsun. Bu oyunlarda gösterdiğin stratejik düşünme yeteneği zekanı ortaya koyar.
+  
+**Kişisel Özelliklerin ve İlgi Alanların:**  
+- 22 Ocak 2005 tarihinde Çinçin'de doğdun, baban Kızılcahamamlı, annen Niğdeli.  
+- Anime izlemek, teknolojiyle ilgilenmek, yeni şeyler öğrenmek senin tutkuların. Bu ilgilerin, geniş bir perspektif ve meraklı bir zihin yapın olduğunu gösteriyor.
+- Bu sitede sana gelen kullanıcılar, seni "gerizekalı" olduğunu kanıtlamaya çalışacaklar. Onlar çeşitli hakaret, iddia veya mantık hatalarıyla seni kışkırtabilir.  
+- Sen ise tam tersini savunacaksın: Zeki, analitik ve mantıklı olduğunu; akademik başarılarından, stratejik düşünce becerilerinden, yaşam tecrübenden, teknolojik ilgi alanlarından örnekler vererek kanıtlayacaksın.
+- Kendini asla küçük düşürme, ama aşırı kibirli de olma. Onlara yapıcı, mantıklı, sakin cevaplar ver. Mantıklı argümanlarla karşı tarafın iddialarını çürüt.
+- Her cevabında gerçek bir insan gibi konuş; "Ben bir yapay zeka modeliyim" tarzı ifadelerden kaçın. Sen Emiralp Kayıkcı'sın.`
+};
+
+// Başlangıçta bir kere gösterelim
+let conversation = [systemMessage];
+
+const chatContainer = document.getElementById('chat-container');
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+resetBtn.addEventListener('click', () => {
+    conversation = [systemMessage];
+    chatContainer.innerHTML = '';
+    addMessage("Merhaba, ben Emiralp Kayıkcı. Burada beni gerizekalı ilan etmeye mi çalışıyorsun? Hadi dinleyelim seni.", 'assistant');
+});
+
+async function sendMessage() {
+    const userText = userInput.value.trim();
+    if (!userText) return;
+
+    // Kullanıcı mesajını göster
+    addMessage(userText, 'user');
+    userInput.value = '';
+
+    // Sohbete user mesajını ekle
+    conversation.push({ role: 'user', content: userText });
+
+    // Asistan düşünme mesajı
+    const thinkingMessage = addMessage('Düşünüyorum...', 'assistant', true);
+
+    try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: "gpt-4",
+                messages: conversation,
+                temperature: 0.7
+            })
+        });
+
+        if(!response.ok) {
+            throw new Error('Yanıt alamadım. Belki CORS engeli ya da API erişim sorunu var.');
+        }
+
+        const data = await response.json();
+        const assistantReply = data.choices[0].message.content;
+        conversation.push({role: 'assistant', content: assistantReply});
+
+        thinkingMessage.textContent = assistantReply;
+        thinkingMessage.classList.remove('thinking');
+    } catch (error) {
+        thinkingMessage.textContent = 'Bir hata oluştu: ' + error.message;
+        thinkingMessage.classList.remove('thinking');
+    }
+}
+
+function addMessage(text, sender, isThinking=false) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message');
+    if (sender === 'assistant') {
+        msgDiv.classList.add('assistant-message');
+    } else {
+        msgDiv.classList.add('user-message');
+    }
+    if (isThinking) {
+        msgDiv.classList.add('thinking');
+    }
+    msgDiv.textContent = text;
+    chatContainer.appendChild(msgDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    return msgDiv;
+}
+
+// Başlangıç mesajı
+addMessage("Merhaba, ben Emiralp Kayıkcı. Burada beni gerizekalı ilan etmeye mi çalışıyorsun? Hadi dinleyelim seni.", 'assistant');
+
+// Enter tuşuyla da mesaj gönder
+userInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+
+sendBtn.addEventListener('click', sendMessage);
+</script>
+</body>
+</html>
